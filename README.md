@@ -1,19 +1,23 @@
 # A Terraform Script for Running a Factorio Server on Azure
 
-This uses [Azure Container Instances](https://azure.microsoft.com/en-us/services/container-instances/) to create and run a server of the game [Factorio](https://factorio.com), based on the Docker image [factoriotools/factorio](https://hub.docker.com/r/factoriotools/factorio/). 
+This uses [Azure Container Instances](https://azure.microsoft.com/en-us/services/container-instances/) to create and run a server of the game [Factorio](https://factorio.com), based on the Docker image [factoriotools/factorio](https://hub.docker.com/r/factoriotools/factorio/). Additionally, there is a small management API included to start/stop the server.
 
 The default is an instance with 2 cores and 4 gb memory, which costs about 83 € a month if it runs the entire time (+ a few cents for the storage). 
 
 Included in this template are:
 - ACI instance
 - Azure Storage Account and file share for game state/settings/...
-- A resource group 
+- A resource group
+- An [Azure function to start/stop and check on the container](https://github.com/celaus/fn-manage-aci)
+- A contributor role assignment for the function to the container instances. i.e. the function will have contributor permissions on your ACI
 
 ## Authentication 
 
 To run this terraform script, you need an Azure subscription and the Azure CLI. Once you have that, and export an environment variable `TF_VAR_tenantid` and `TF_VAR_subid` to pass these values into the Terraform provider. 
 
 [This guide](https://www.terraform.io/docs/providers/azurerm/guides/azure_cli.html) explains what's going on.
+
+The provided Functions can be looked at [here](https://github.com/celaus/fn-manage-aci). The terraform template deploys a release (probably the latest, check [main.tf](main.tf)) from there as functions with a function-level authentication. In order to call the functions get the host key from the Function app via the [Azure Portal](https://portal.azure.com) or any other way you prefer. 
 
 ## Set up and Run
 
@@ -79,7 +83,7 @@ azurerm_resource_group.main: Creating...
 azurerm_container_group.gameserv: Creation complete after 1m8s
 ~~~
 
-... and you should be good to go.
+... and you should be good to go. Check the deployment in the [portal](https://portal.azure.com) and while you are there you can get the keys for the function app. The handlers are all `GET` so use a browser to call `https://<dns_label>-ctrl.azurewebsites.net/api/status?code=<host key from the Azure function App>`. Instead of `/api/status` you can also call `/api/start` or `/api/stop` for the respective actions. 
 
 ## Configure Factorio
 

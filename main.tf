@@ -1,17 +1,25 @@
 variable REGION {
-    default = "westeurope"
+  default = "westeurope"
 }
 
 variable n_cores {
-    default = 2
+  default = 2
 }
 
 variable mem_gb {
-    default = 4
+  default = 4
+}
+
+variable package_deploy_url {
+  default = "https://github.com/celaus/fn-manage-aci/releases/download/tag-7287778cb03583625477550ab8eb6fcabe5a7120/aci-manage.zip"
 }
 
 variable RESOURCE_GROUP_NAME {
-    default = "factorio"
+  default = "factorio"
+}
+
+variable factorio_server_version {
+  default = "0.18.15"
 }
 
 variable dns_label {}
@@ -19,7 +27,7 @@ variable tenantid {}
 variable subid {}
 
 provider "azurerm" {
-  version  = "~>2.2.0"
+  version = "~>2.2.0"
   features {}
 
   subscription_id = var.subid
@@ -58,7 +66,7 @@ resource "azurerm_container_group" "gameserv" {
 
   container {
     name   = "factoriogame"
-    image  = "factoriotools/factorio"
+    image  = "factoriotools/factorio:${var.factorio_server_version}"
     cpu    = var.n_cores
     memory = var.mem_gb
 
