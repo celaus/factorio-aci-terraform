@@ -19,7 +19,7 @@ variable RESOURCE_GROUP_NAME {
 }
 
 variable factorio_server_version {
-  default = "0.18.15"
+  default = "0.18.21"
 }
 
 variable dns_label {}
